@@ -11,8 +11,8 @@ public class Case {
 	
 	int type = 0;
 	
-	private int x;
-	private int y;
+	protected int x;
+	protected int y;
 	private String text;
 	
 	public Case(int type, int x, int y) {

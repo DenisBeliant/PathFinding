@@ -1,6 +1,12 @@
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
@@ -17,13 +23,16 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
-public class Plateau extends JPanel{
+public class Plateau extends JPanel implements MouseListener, KeyListener {
 
 	private static final long serialVersionUID = 1L;
 	private SpringLayout layout = new SpringLayout();
 	public Mur[][] cases;
+	public Find find;
 	private int[] start = {0, 0};
 	private int[] finish = {0, 0};
+	
+	private int tCase = 30;
 	
 	private int colonnes;
 	private int lignes;
@@ -35,6 +44,8 @@ public class Plateau extends JPanel{
 		//this.setBorder(new javax.swing.border.BevelBorder(javax.swing.border.BevelBorder.LOWERED));
 		//this.setLayout(layout);
 		this.setBackground(Color.RED);
+		this.addMouseListener(this);
+		this.addKeyListener(this);
 		this.colonnes = colonnes;
 		this.lignes = lignes;
 
@@ -61,22 +72,22 @@ public class Plateau extends JPanel{
 				default: break;
 				}
 				
-				g.fillRect(30 * this.cases[c][l].getX(), 30 * this.cases[c][l].getY(), 30, 30);
-				g.setColor(new Color(163, 163, 163));
-				g.drawRect(30 * c,  30 * l, 30, 30);
+				g.fillRect(tCase * this.cases[c][l].getX(), tCase * this.cases[c][l].getY(), tCase, tCase);
+				//g.setColor(new Color(163, 163, 163));
+				//g.drawRect(30 * c,  30 * l, 30, 30);
 				if(text != null) {
 					g.setColor(new Color(0, 0, 0));
-					g.drawString(text, 30 * c + 10,  30 * l + 18);
+					g.drawString(text, tCase * c + 10,  tCase * l + 18);
 				}
 				
 				boolean murs[] = this.cases[c][l].getMurs();
 				
 				g.setColor(new Color(163, 163, 163));
 				
-				if(murs[0]) g.fillRect(30 * this.cases[c][l].getX(), 30 * this.cases[c][l].getY(),  30, 2); // Up OK
-				if(murs[1]) g.fillRect(30 * this.cases[c][l].getX() + 28, 30 * this.cases[c][l].getY(),  2 , 30); // Right OK
-				if(murs[2]) g.fillRect(30 * this.cases[c][l].getX(), 30 * this.cases[c][l].getY() + 28,  30 , 2); // Down OK
-				if(murs[3]) g.fillRect(30 * this.cases[c][l].getX(), 30 * this.cases[c][l].getY(),  2, 30); // Left OK
+				if(murs[0]) g.fillRect(tCase * this.cases[c][l].getX(), tCase * this.cases[c][l].getY(),  tCase, 2); // Up OK
+				if(murs[1]) g.fillRect(tCase * this.cases[c][l].getX() + 28, tCase * this.cases[c][l].getY(),  2 , tCase); // Right OK
+				if(murs[2]) g.fillRect(tCase * this.cases[c][l].getX(), tCase * this.cases[c][l].getY() + 28,  tCase, 2); // Down OK
+				if(murs[3]) g.fillRect(tCase * this.cases[c][l].getX(), tCase * this.cases[c][l].getY(),  2, tCase); // Left OK
 			}
 		}
 }
@@ -84,16 +95,17 @@ public class Plateau extends JPanel{
 	public void createPlateau() {
 		
 		this.cases = new Mur[this.colonnes][this.lignes];
-		
-		boolean murs[] = {false, false, false, false};
-		
+		boolean murs[]  = {false, false, false, false};
+			
 		for(int i = 0; i < colonnes; i++) {
 			for(int j = 0; j < lignes; j++) {
-				int r = (int) (Math.random()*4);
-				this.cases[i][j] = new Mur(r, i, j, murs);
+				for(byte r = 0; r < 4; r++) {
+					double s = Math.random()*1;
+					murs[r] = s > 0.5 ? true : false;
+				}
+				this.cases[i][j] = new Mur(0, i, j, murs.clone());
 			}
 		}
-		//this.cases[0] = new Case("Joueur", "", 0);
 			
 	}
 	
@@ -201,5 +213,92 @@ public class Plateau extends JPanel{
 	public int getLignes()	 {
 		return this.lignes;
 	}
+
+	@Override
+	public void mouseClicked(MouseEvent e) {
+		// TODO Auto-generated method stub
+	}
+
+	@Override
+	public void mousePressed(MouseEvent e) {
+		// TODO Auto-generated method stub
+		System.out.println("Click");
+		
+		int button = e.getButton();
+		
+		System.out.println(button);
+		
+		System.out.println("X : " + e.getX() + " Y : " + e.getY());
+		
+		Mur current;
+		
+		if((int) Math.floor(e.getX() / tCase) >= 0 && (int) Math.floor(e.getX() / tCase) < this.colonnes && (int) Math.floor(e.getY() / tCase) >= 0 && (int) Math.floor(e.getY() / tCase) < this.lignes) current = this.cases[(int) Math.floor(e.getX() / tCase)][(int) Math.floor(e.getY() / tCase)];
+		else current = null;
+
+		if(current != null) {
+			if(button == 1) {
+				this.cases[this.finish[0]][this.finish[1]].changeType(0);
+				this.finish[0] = current.getX();
+				this.finish[1] = current.getY();
+				
+				
+				current.changeType(5);
+				current.setText("");
+			}
+			else if(button == 2) {
+				current.changeType(0);
+				current.setText("");
+			}
+			else {
+				this.cases[this.start[0]][this.start[1]].changeType(0);
+				this.start[0] = current.getX();
+				this.start[1] = current.getY();
+				
+				
+				current.changeType(4);
+				current.setText("");
+			}
+		}
+		
+		repaint();
+		
+	}
+
+	@Override
+	public void mouseReleased(MouseEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void mouseEntered(MouseEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void mouseExited(MouseEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void keyTyped(KeyEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void keyPressed(KeyEvent e) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void keyReleased(KeyEvent e) {
+		// TODO Auto-generated method stub
+		System.out.println(e.getKeyChar());
+	}
+	
 	
 }

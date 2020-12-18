@@ -1,4 +1,6 @@
 import java.awt.event.ActionListener;
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.Timer;
 
 public class Find {
@@ -18,6 +20,7 @@ public class Find {
 		switch(this.algo) {
 			case 0: return this.tourneDroite();
 			case 1: return this.makePfs();
+			case 2: return this.bfs();
 			default : return 500;
 		}
 	}
@@ -26,8 +29,6 @@ public class Find {
 		int[] finish = plateau.getFinish();
 		int[] posPerso = perso.getPos();
 		
-		boolean block = false;
-		int mv = 5;
 		int essais = 0;
 		
 		while(posPerso[0] != finish[0] || posPerso[1] != finish[1]) {
@@ -87,9 +88,9 @@ public class Find {
 		int[] posPerso = perso.getPos();
 		if(pfs(posPerso[0], posPerso[1])) {
 			System.out.println("Ok");
-			return 10;
+			return 1;
 			}
-		else return 20;
+		else return 2;
 	}
 	
 	public boolean pfs(int x, int y) {
@@ -135,20 +136,38 @@ public class Find {
 		
 	}
 	
-	public boolean bfs() {
-		int colonnes = this.plateau.getColonnes();
-		int lignes = this.plateau.getLignes();
-		
-		this.node = new Node[colonnes][lignes];
-		
-		for(byte c = 0; c < colonnes; c++) {
-			for(byte l = 0; l < lignes; l++) {
-				int[] pos = {this.plateau.cases[c][l].getX(), this.plateau.cases[c][l].getY()};
-				this.node[c][l] = new Node(pos, this.plateau.cases[c][l].getMurs());
-			}
-		}
-		
-		return true;
-	}
+	private void rempliCasePossible(Mur kaze,Queue <Mur> file) {
+        if (kaze.getMurs()[0] == false && this.plateau.cases[kaze.getX()][kaze.getY() - 1].getText() == null) {
+            file.add(this.plateau.cases[kaze.getX()][kaze.getY() - 1]);
+        } 
+        if (kaze.getMurs()[1] == false && this.plateau.cases[kaze.getX() + 1][kaze.getY()].getText() == null) {
+            file.add(this.plateau.cases[kaze.getX() + 1][kaze.getY()]);
+        } 
+        if (kaze.getMurs()[2] == false && this.plateau.cases[kaze.getX()][kaze.getY() + 1].getText() == null){
+            file.add(this.plateau.cases[kaze.getX()][kaze.getY() + 1]);
+        }
+        if (kaze.getMurs()[3] == false && this.plateau.cases[kaze.getX() - 1][kaze.getY()].getText() == null) {
+            file.add(this.plateau.cases[kaze.getX() - 1][kaze.getY()]);
+        }
+    }
+    private int bfs() {
+    	Mur caseD = this.plateau.cases[this.plateau.getStart()[0]][this.plateau.getStart()[1]];
+    	Mur caseF = this.plateau.cases[this.plateau.getFinish()[0]][this.plateau.getFinish()[1]];
+    	
+        Mur caseActuelle  = caseD;
+        Queue<Mur> casesEnCour = new LinkedList<>();
+        casesEnCour.add(caseActuelle);
+        
+        while (caseActuelle  != caseF) {
+        	
+            caseActuelle = casesEnCour.peek();
+            caseActuelle.setText("X");
+            rempliCasePossible(caseActuelle, casesEnCour);
+            casesEnCour.remove();
+            
+        }
+        System.out.println("gagne");
+        return 10;
+    }
 
 }

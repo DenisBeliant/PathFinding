@@ -46,92 +46,43 @@ public class GUI extends JFrame {
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		contentPane.setBackground(Color.WHITE);
 		
-		ActionsUI save = new ActionsUI("Sauvegarder");
-		ActionsUI charge = new ActionsUI("Charger") ;
-		ActionsUI clean = new ActionsUI("Nettoyer");
-		
-	    NumberFormat format = NumberFormat.getIntegerInstance();
-	    format.setGroupingUsed(false);
-
-	    NumberFormatter numberFormatter = new NumberFormatter(format);
-	    numberFormatter.setValueClass(Long.class); 
-	    numberFormatter.setAllowsInvalid(false); //this is the key
-
-	    JFormattedTextField ex = new JFormattedTextField(numberFormatter);
-		
-		ActionsUI placeStart = new ActionsUI("Placer départ", new Color(0, 255, 0));
-		ActionsUI placeFinish = new ActionsUI("Placer arrivée", new Color(255, 0, 0));
-		
-		ActionsUI eau = new ActionsUI("EAU", new Color(0, 0, 255));
-		ActionsUI route = new ActionsUI("ROUTE", new Color(156, 161, 157));
-		ActionsUI herbe = new ActionsUI("HERBE", new Color(0, 255, 0));
-		ActionsUI mur = new ActionsUI("MUR", new Color(255, 0, 0)); 
-		
-		Plateau plateau = new Plateau(5, 3);
-		plateau.createPlateauJson("24", "ex-1");
+		Plateau plateau;
+		Find find;
+		plateau = new Plateau(10, 10);
+		plateau.createPlateauJson("14", "ex-0");
 		//plateau.startFinishRandom();
-		
 		perso = new Perso(plateau.getStart());
+		find = new Find(perso, plateau, 2);
 		
-		Find find = new Find(perso, plateau, 1);
+
+//		while(true) {
+//			plateau = new Plateau(10, 10);
+//			plateau.createPlateau();
+//			plateau.startFinishRandom();
+//			perso = new Perso(plateau.getStart());
+//			find = new Find(perso, plateau, 1);
+//			if(find.pfs(plateau.getStart()[0], plateau.getStart()[1])) break;
+//			else System.out.println("Pass");
+//		}
 		
-		layout.putConstraint(SpringLayout.NORTH, save, 10, SpringLayout.NORTH, contentPane);
-		layout.putConstraint(SpringLayout.WEST, save, 20, SpringLayout.WEST, contentPane);
+		//perso = new Perso(plateau.getStart());
 		
-		layout.putConstraint(SpringLayout.NORTH, charge, 10, SpringLayout.NORTH, contentPane);
-		layout.putConstraint(SpringLayout.WEST, charge, 5, SpringLayout.EAST, save);
-		
-		layout.putConstraint(SpringLayout.NORTH, clean, 10, SpringLayout.NORTH, contentPane);
-		layout.putConstraint(SpringLayout.WEST, clean, 5, SpringLayout.EAST, charge);
-		
-		layout.putConstraint(SpringLayout.SOUTH, eau, -30, SpringLayout.SOUTH, contentPane);
-		layout.putConstraint(SpringLayout.WEST, eau, 20, SpringLayout.WEST, contentPane);
-		
-		layout.putConstraint(SpringLayout.SOUTH, mur, -30, SpringLayout.SOUTH, contentPane);
-		layout.putConstraint(SpringLayout.WEST, mur, 20, SpringLayout.EAST, eau);
-		
-		layout.putConstraint(SpringLayout.SOUTH, herbe, -30, SpringLayout.SOUTH, contentPane);
-		layout.putConstraint(SpringLayout.WEST, herbe, 20, SpringLayout.EAST, mur);
-		
-		layout.putConstraint(SpringLayout.SOUTH, route, -30, SpringLayout.SOUTH, contentPane);
-		layout.putConstraint(SpringLayout.WEST, route, 20, SpringLayout.EAST,  herbe);
+		//Find find = new Find(perso, plateau, 1);
 		
 		
-		layout.putConstraint(SpringLayout.NORTH, placeFinish, 10, SpringLayout.NORTH, contentPane);
-		layout.putConstraint(SpringLayout.EAST, placeFinish, -10, SpringLayout.EAST, contentPane);
-		
-		layout.putConstraint(SpringLayout.NORTH, placeStart, 10, SpringLayout.NORTH, contentPane);
-		layout.putConstraint(SpringLayout.EAST, placeStart, -10, SpringLayout.WEST, placeFinish);
-		
-		layout.putConstraint(SpringLayout.NORTH, ex, 10, SpringLayout.SOUTH, placeFinish);
-		layout.putConstraint(SpringLayout.EAST, ex, 10, SpringLayout.EAST, contentPane);
-		
-		
-		layout.putConstraint(SpringLayout.NORTH, plateau, 20, SpringLayout.SOUTH, save);
+		layout.putConstraint(SpringLayout.NORTH, plateau, 20, SpringLayout.NORTH, contentPane);
 		layout.putConstraint(SpringLayout.WEST, plateau, 5, SpringLayout.WEST, contentPane);
 		layout.putConstraint(SpringLayout.EAST, plateau, -5, SpringLayout.EAST, contentPane);
 		
-		this.getContentPane().add(save);
-		this.getContentPane().add(charge);
-		this.getContentPane().add(clean);
-		
-//		this.getContentPane().add(mur);
-//		this.getContentPane().add(eau);
-//		this.getContentPane().add(herbe);
-//		this.getContentPane().add(route);
-		
-		this.getContentPane().add(placeStart);
-		this.getContentPane().add(placeFinish);
 		
 		this.getContentPane().add(plateau);
 		
 		//this.add(plateau, BorderLayout.CENTER);
 		
 //		this.getContentPane().add(ex);
-
+		System.out.println(find.play());
 		this.setVisible(true);
 		
-		System.out.println(find.play());
 
 	}
 
